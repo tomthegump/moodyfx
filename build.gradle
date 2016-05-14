@@ -1,0 +1,30 @@
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
+
+sourceCompatibility = 1.8
+
+dependencies {
+    compile 'de.saxsys:mvvmfx:1.4.1'
+}
+
+javafx {
+    // Points to JDK and its JavaFX libraries, also declares target runtime JDK
+    javaRuntime = System.getenv("JAVAHOME")
+
+    // Application name and ID presented by target OS
+    appID 'MoodyFx'
+    appName 'Moody FX'
+
+    // Main class of application
+    mainClass 'sample.Main'
+
+    // JVM arguments, system properties, application command line arguments
+    jvmArgs = ['-XX:+AggressiveOpts', '-XX:CompileThreshold=1']
+    systemProperties = ['prism.disableRegionCaching':'true']
+    arguments = ['-l', '--fast']
+}
