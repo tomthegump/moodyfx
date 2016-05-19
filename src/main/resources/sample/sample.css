@@ -1,0 +1,7 @@
+.root {
+    -fx-background-color: linear-gradient(from 0% 0% to 80% 80%, #404040, #101010);
+}
+
+#question-label {
+    -fx-text-fill: #EEEEEE;
+}
