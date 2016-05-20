@@ -14,7 +14,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
-        surveyDatabaseHelper.insert(survey);
+//        surveyDatabaseHelper.insert(survey, System.out::println);
         surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
