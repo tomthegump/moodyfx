@@ -20,16 +20,22 @@ public class Survey {
         }
     }
 
+    private int id;
     private String question;
     private AnswerType answerType;
 
-    public Survey(String question) {
-        this(question, AnswerType.FACE);
+    public Survey(int id, String question) {
+        this(id, question, AnswerType.FACE);
     }
 
-    public Survey(String question, AnswerType answerType) {
+    public Survey(int id, String question, AnswerType answerType) {
+        this.id = id;
         this.question = question;
         this.answerType = answerType;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getQuestion() {
@@ -38,5 +44,14 @@ public class Survey {
 
     public AnswerType getAnswerType() {
         return answerType;
+    }
+
+    @Override
+    public String toString() {
+        return "Survey{" +
+                "id=" + id +
+                ", question='" + question + '\'' +
+                ", answerType=" + answerType +
+                '}';
     }
 }

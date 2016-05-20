@@ -91,7 +91,7 @@ public class SQLiteDatabaseTest {
 
         // when
         final Counter resultCount = new Counter();
-        cut.executeQueryAsync(queryStatement)
+        cut.executeQueryAsync(queryStatement, r -> "")
                 .subscribe(r -> resultCount.increment(), SQLiteDatabaseTest::printErrorAndFail);
 
         // then

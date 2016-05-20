@@ -6,12 +6,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import sample.persistence.SurveyDatabaseHelper;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Survey survey = new Survey("How are you today?", Survey.AnswerType.HAND);
+        Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
+        SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
+        surveyDatabaseHelper.insert(survey);
+        surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = fxmlLoader.load();

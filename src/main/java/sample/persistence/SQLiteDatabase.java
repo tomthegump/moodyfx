@@ -1,8 +1,11 @@
 package sample.persistence;
 
+import com.sun.rowset.CachedRowSetImpl;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.subjects.ReplaySubject;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -58,9 +61,9 @@ public class SQLiteDatabase {
         return statement.executeQuery(queryStatement);
     }
 
-    public Observable<ResultSet> executeQueryAsync(final String queryStatement) {
-        final ReplaySubject<ResultSet> resultObservable = ReplaySubject.create();
-        statementExecutor.execute(new QueryRunnable(queryStatement, resultObservable));
+    public <T> Observable<T> executeQueryAsync(final String queryStatement, Func1<ResultSet, T> mapper) {
+        final ReplaySubject<T> resultObservable = ReplaySubject.create();
+        statementExecutor.execute(new QueryRunnable<>(queryStatement, resultObservable, mapper));
         return resultObservable;
     }
 
@@ -91,14 +94,16 @@ public class SQLiteDatabase {
         }
     }
 
-    private final class QueryRunnable implements Runnable {
+    private final class QueryRunnable<T> implements Runnable {
 
-        private final ReplaySubject<ResultSet> resultObservable;
+        private final ReplaySubject<T> resultObservable;
+        private final Func1<ResultSet, T> mapper;
         private final String queryStatement;
 
-        QueryRunnable(final String queryStatement, final ReplaySubject<ResultSet> resultObservable) {
+        QueryRunnable(final String queryStatement, final ReplaySubject<T> resultObservable, Func1<ResultSet, T> mapper) {
             this.queryStatement = queryStatement;
             this.resultObservable = resultObservable;
+            this.mapper = mapper;
         }
 
         @Override
@@ -106,7 +111,8 @@ public class SQLiteDatabase {
             try {
                 final ResultSet resultSet = executeQuery(queryStatement);
                 while (resultSet.next()) {
-                    resultObservable.onNext(resultSet);
+                    T mappedData = mapper.call(resultSet);
+                    resultObservable.onNext(mappedData);
                 }
                 resultSet.close();
                 resultObservable.onCompleted();

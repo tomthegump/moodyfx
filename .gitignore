@@ -2,7 +2,10 @@
 .gradle
 out
 build
+classes
 
 *.iml
 *.ipr
 *.iws
+*.db
+

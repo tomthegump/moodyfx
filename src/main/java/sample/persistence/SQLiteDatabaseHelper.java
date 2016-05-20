@@ -1,5 +1,6 @@
 package sample.persistence;
 
+import javax.sql.rowset.CachedRowSet;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
