@@ -38,7 +38,7 @@ public class SQLiteDatabaseTest {
     }
 
     @Test
-    public void executeInsert() throws Exception {
+    public void shouldInsertGivenData() throws Exception {
         // given
         final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
 
@@ -50,7 +50,7 @@ public class SQLiteDatabaseTest {
     }
 
     @Test
-    public void executeInsertAsync() throws Exception {
+    public void shouldInsertGivenDataAsync() throws Exception {
         // given
         final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
 
@@ -59,7 +59,7 @@ public class SQLiteDatabaseTest {
     }
 
     @Test
-    public void executeQuery() throws Exception {
+    public void shouldGiveQueryResults() throws Exception {
         // given
         final String insertStatement1 = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
         cut.executeInsert(insertStatement1);
@@ -81,7 +81,7 @@ public class SQLiteDatabaseTest {
     }
 
     @Test
-    public void executeQueryAsync() throws Exception {
+    public void shouldGiveQueryResultsAsync() throws Exception {
         // given
         final String insertStatement1 = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg');";
         cut.executeInsert(insertStatement1);
