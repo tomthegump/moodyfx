@@ -34,7 +34,7 @@ public class SQLiteDatabaseTest {
     @After
     public void tearDown() throws Exception {
         cut.close();
-        new File(DB_NAME + ".db").deleteOnExit();
+        new File(DB_NAME + ".db").delete();
     }
 
     @Test
