@@ -1,4 +1,4 @@
-package sample;
+package sample.persistence;
 
 import org.junit.After;
 import org.junit.Assert;

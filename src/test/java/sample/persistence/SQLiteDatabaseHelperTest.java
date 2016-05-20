@@ -1,8 +1,10 @@
-package sample;
+package sample.persistence;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import sample.persistence.SQLiteDatabase;
+import sample.persistence.SQLiteDatabaseHelper;
 
 import java.io.File;
 import java.sql.SQLException;

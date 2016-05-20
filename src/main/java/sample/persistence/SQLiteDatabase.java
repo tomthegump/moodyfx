@@ -1,4 +1,4 @@
-package sample;
+package sample.persistence;
 
 import rx.Observable;
 import rx.subjects.ReplaySubject;

@@ -1,4 +1,4 @@
-package sample;
+package sample.persistence;
 
 import java.io.File;
 import java.sql.ResultSet;
