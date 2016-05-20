@@ -6,10 +6,12 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
 
-sourceCompatibility = 1.8
-
 dependencies {
     compile 'de.saxsys:mvvmfx:1.4.1'
+    compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+    compile 'io.reactivex:rxjava:1.1.5'
+
+    testCompile 'junit:junit:4.12'
 }
 
 javafx {
