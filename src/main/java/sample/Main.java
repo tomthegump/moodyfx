@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,8 +14,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
+        
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
-//        surveyDatabaseHelper.insert(survey, System.out::println);
+        surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
         surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
@@ -27,6 +29,7 @@ public class Main extends Application {
         primaryStage.setFullScreen(true);
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setFullScreenExitHint("");
+        primaryStage.setOnCloseRequest(e -> {Platform.exit(); System.exit(0);});
         primaryStage.show();
     }
 

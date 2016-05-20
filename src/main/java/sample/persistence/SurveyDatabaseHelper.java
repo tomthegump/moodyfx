@@ -60,4 +60,11 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
         getDatabaseAccess().executeInsertAsync(statement, resultCallback);
     }
 
+    public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
+                             final SQLiteDatabase.ErrorCallback errorCallback) {
+        final String statement = "INSERT INTO surveys (id, question, answerType) " +
+                "VALUES (" + survey.getId() + ", '" + survey.getQuestion() + "', '" + survey.getAnswerType() + "')";
+        getDatabaseAccess().executeInsertAsync(statement, resultCallback, errorCallback);
+    }
+
 }
