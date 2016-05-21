@@ -5,6 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import sample.data.Survey;
 
 import java.net.URL;
 import java.util.ResourceBundle;

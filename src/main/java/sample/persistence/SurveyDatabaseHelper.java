@@ -1,7 +1,8 @@
 package sample.persistence;
 
 import rx.Observable;
-import sample.Survey;
+import sample.data.Survey;
+import sample.data.Vote;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,20 +39,8 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
     }
 
     public final Observable<Survey> queryAllSurveys() {
-        String statement = "SELECT * FROM " + SurveyTableHelper.TABLE_NAME;
-        return getDatabaseAccess().executeQueryAsync(statement, SurveyDatabaseHelper::mapToSurvey);
-    }
-
-    private static Survey mapToSurvey(final ResultSet resultSet) {
-        try {
-            final int id = resultSet.getInt(SurveyTableHelper.COLUMN_ID);
-            final String question = resultSet.getString(SurveyTableHelper.COLUMN_QUESTION);
-            final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(SurveyTableHelper.COLUMN_ANSWER_TYPE));
-            return new Survey(id, question, answerType);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        String queryStatement = SurveyTableHelper.createSelectAllStatement();
+        return getDatabaseAccess().executeQueryAsync(queryStatement, SurveyTableHelper::mapResultSetToSurvey);
     }
 
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback) {
@@ -62,6 +51,22 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
         final String insertStatement = SurveyTableHelper.createInsertStatement(survey);
+        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback, errorCallback);
+    }
+
+    public final Observable<Vote> queryAllVotes() {
+        String queryStatement = VotesTableHelper.createSelectAllStatement();
+        return getDatabaseAccess().executeQueryAsync(queryStatement, VotesTableHelper::mapResultSetToVote);
+    }
+
+    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Boolean> resultCallback) {
+        final String insertStatement = VotesTableHelper.createInsertStatement(vote);
+        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback);
+    }
+
+    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
+                             final SQLiteDatabase.ErrorCallback errorCallback) {
+        final String insertStatement = VotesTableHelper.createInsertStatement(vote);
         getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback, errorCallback);
     }
 

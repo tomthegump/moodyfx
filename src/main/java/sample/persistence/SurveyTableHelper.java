@@ -1,7 +1,8 @@
 package sample.persistence;
 
-import sample.Survey;
+import sample.data.Survey;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -38,14 +39,30 @@ final class SurveyTableHelper {
         }
     }
 
+    static String createSelectAllStatement() {
+        return "SELECT * FROM " + TABLE_NAME;
+    }
+
     static String createInsertStatement(final Survey survey) {
-        return "INSERT INTO " + SurveyTableHelper.TABLE_NAME +
-                " (" + SurveyTableHelper.COLUMN_ID +
-                ", " + SurveyTableHelper.COLUMN_QUESTION +
-                ", " + SurveyTableHelper.COLUMN_ANSWER_TYPE + ") " +
+        return "INSERT INTO " + TABLE_NAME +
+                " (" + COLUMN_ID +
+                ", " + COLUMN_QUESTION +
+                ", " + COLUMN_ANSWER_TYPE + ") " +
                 "VALUES (" + survey.getId() +
                 ", '" + survey.getQuestion() +
                 "', '" + survey.getAnswerType() + "')";
+    }
+
+    static Survey mapResultSetToSurvey(final ResultSet resultSet) {
+        try {
+            final int id = resultSet.getInt(COLUMN_ID);
+            final String question = resultSet.getString(COLUMN_QUESTION);
+            final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(COLUMN_ANSWER_TYPE));
+            return new Survey(id, question, answerType);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

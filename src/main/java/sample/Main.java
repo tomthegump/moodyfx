@@ -5,8 +5,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import sample.data.Survey;
+import sample.data.Vote;
 import sample.persistence.SurveyDatabaseHelper;
 
 public class Main extends Application {
@@ -18,6 +19,10 @@ public class Main extends Application {
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
         surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
         surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
+
+        Vote vote = new Vote(survey.getId(), 4, "C2-Team");
+        surveyDatabaseHelper.insert(vote, System.out::println, System.err::println);
+        surveyDatabaseHelper.queryAllVotes().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = fxmlLoader.load();
