@@ -55,16 +55,14 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
     }
 
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback) {
-        final String statement = "INSERT INTO surveys (id, question, answerType) " +
-                "VALUES (" + survey.getId() + ", '" + survey.getQuestion() + "', '" + survey.getAnswerType() + "')";
-        getDatabaseAccess().executeInsertAsync(statement, resultCallback);
+        final String insertStatement = SurveyTableHelper.createInsertStatement(survey);
+        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback);
     }
 
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
-        final String statement = "INSERT INTO surveys (id, question, answerType) " +
-                "VALUES (" + survey.getId() + ", '" + survey.getQuestion() + "', '" + survey.getAnswerType() + "')";
-        getDatabaseAccess().executeInsertAsync(statement, resultCallback, errorCallback);
+        final String insertStatement = SurveyTableHelper.createInsertStatement(survey);
+        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback, errorCallback);
     }
 
 }

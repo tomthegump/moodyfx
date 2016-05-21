@@ -1,5 +1,7 @@
 package sample.persistence;
 
+import sample.Survey;
+
 import java.sql.SQLException;
 
 /**
@@ -34,6 +36,16 @@ final class SurveyTableHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    static String createInsertStatement(final Survey survey) {
+        return "INSERT INTO " + SurveyTableHelper.TABLE_NAME +
+                " (" + SurveyTableHelper.COLUMN_ID +
+                ", " + SurveyTableHelper.COLUMN_QUESTION +
+                ", " + SurveyTableHelper.COLUMN_ANSWER_TYPE + ") " +
+                "VALUES (" + survey.getId() +
+                ", '" + survey.getQuestion() +
+                "', '" + survey.getAnswerType() + "')";
     }
 
 }

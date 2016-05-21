@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
-        
+
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
         surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
         surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
