@@ -1,11 +1,11 @@
 package sample.persistence;
 
-import com.sun.rowset.CachedRowSetImpl;
+import org.sqlite.SQLiteConfig;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.ReplaySubject;
 
-import javax.sql.rowset.CachedRowSet;
+import java.io.File;
 import java.sql.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -25,15 +25,46 @@ public class SQLiteDatabase {
         void onError(Throwable e);
     }
 
+    private static final String JDBC_SQLITE_PREFIX = "jdbc:sqlite:";
+    private static final String DB_FILE_ENDING = ".db";
+
     private final Connection dbConnection;
+    private final File dbFile;
     private Executor statementExecutor = Executors.newFixedThreadPool(10);
 
-    public static SQLiteDatabase connectTo(String dbName) throws SQLException {
-        return new SQLiteDatabase(DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db"));
+    public static SQLiteDatabase connectTo(final String dbName) throws SQLException {
+        return connectTo(dbName, false);
     }
 
-    private SQLiteDatabase(final Connection dbConnection) {
+    public static SQLiteDatabase connectTo(final String dbName, final File directory ) throws SQLException {
+        return connectTo(dbName, directory, false);
+    }
+
+    public static SQLiteDatabase connectTo(final String dbName, boolean readOnly) throws SQLException {
+        return connectTo(dbName, new File("."), readOnly);
+    }
+
+    public static SQLiteDatabase connectTo(final String dbName, final File directory, final boolean readOnly) throws SQLException {
+        final SQLiteConfig config = new SQLiteConfig();
+        config.setReadOnly(readOnly);
+
+        if(!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        if(!directory.isDirectory()) {
+            throw new SQLException("The given file must be a directory! ["+ directory.getAbsolutePath() + "]" );
+        }
+
+        final File dbFile = new File(directory, dbName + DB_FILE_ENDING);
+        final String connectionUri = JDBC_SQLITE_PREFIX + dbFile.getAbsolutePath();
+        final Connection dbConnection = DriverManager.getConnection(connectionUri, config.toProperties());
+        return new SQLiteDatabase(dbConnection, dbFile);
+    }
+
+    private SQLiteDatabase(final Connection dbConnection, final File dbFile) {
         this.dbConnection = dbConnection;
+        this.dbFile = dbFile;
     }
 
     public void setStatementExecutor(final Executor newStatementExecutor) {
@@ -69,6 +100,18 @@ public class SQLiteDatabase {
 
     public void close() throws SQLException {
         dbConnection.close();
+    }
+
+    public boolean isReadOnly() throws SQLException {
+        return dbConnection.isReadOnly();
+    }
+
+    public File getDbFile() {
+        return dbFile;
+    }
+
+    public boolean delete() {
+        return dbFile.delete();
     }
 
     private final class InsertRunnable implements Runnable {
