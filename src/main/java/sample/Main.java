@@ -17,16 +17,19 @@ public class Main extends Application {
         Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
 
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
-        surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
-        surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
+//        surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
+//        surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
 
-        Vote vote = new Vote(survey.getId(), 4, "C2-Team");
-        surveyDatabaseHelper.insert(vote, System.out::println, System.err::println);
-        surveyDatabaseHelper.queryAllVotes().subscribe(System.out::println);
+//        Vote vote = new Vote(survey.getId(), 4, "C2-Team");
+//        surveyDatabaseHelper.insert(vote, System.out::println, System.err::println);
+//        surveyDatabaseHelper.queryAllVotes().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = fxmlLoader.load();
         Controller controller = fxmlLoader.getController();
+        controller.setVoteStore((surveyId, votedPoints) ->
+                        surveyDatabaseHelper.insert(new Vote(surveyId, votedPoints, "C2-Team"),
+                        result -> System.out.println("Voted Successfully"), System.err::println));
         controller.showSurvey(survey);
 
         primaryStage.setTitle("Moody");
