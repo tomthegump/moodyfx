@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
 import sample.data.Survey;
-import sample.persistence.SurveyDatabaseHelper;
 
 public class Launcher extends Application {
 
@@ -20,8 +19,6 @@ public class Launcher extends Application {
         Parent root = fxmlLoader.load();
         MainController mainController = fxmlLoader.getController();
         mainController.showSurvey(survey);
-
-        SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
 
         Scene scene = new Scene(root, 1000, 600);
         scene.setOnKeyPressed(event -> {
