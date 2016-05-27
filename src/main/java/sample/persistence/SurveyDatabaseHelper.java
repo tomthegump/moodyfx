@@ -54,8 +54,13 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
     }
 
     public final Observable<Vote> selectAllVotes() {
-        String queryStatement = VotesTableHelper.createSelectAllStatement();
-        return getDatabaseAccess().select(queryStatement, VotesTableHelper::mapResultSetToVote);
+        String selectStatement = VotesTableHelper.createSelectAllStatement();
+        return getDatabaseAccess().select(selectStatement, VotesTableHelper::mapResultSetToVote);
+    }
+
+    public final Observable<Vote> selectAllVotesForSurvey(int surveyId) {
+        String selectStatement = VotesTableHelper.createSelectBySurveyStatement(surveyId);
+        return getDatabaseAccess().select(selectStatement, VotesTableHelper::mapResultSetToVote);
     }
 
     public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Integer> resultCallback) {
@@ -68,5 +73,4 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
         final ContentValues valuesToInsert = VotesTableHelper.createContentValues(vote);
         getDatabaseAccess().insert(VotesTableHelper.TABLE_NAME, valuesToInsert, resultCallback, errorCallback);
     }
-
 }

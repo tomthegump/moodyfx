@@ -13,7 +13,7 @@ public class Vote {
     private final String site;
 
     public Vote(int surveyId, int votedPoints, String site) {
-        this(votedPoints, surveyId, site, new Date());
+        this(surveyId, votedPoints, site, new Date());
     }
 
     public Vote(int surveyId, int votedPoints, String site, Date timestamp) {

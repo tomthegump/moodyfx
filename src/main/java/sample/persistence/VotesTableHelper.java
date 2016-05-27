@@ -75,6 +75,10 @@ final class VotesTableHelper {
         return "SELECT * FROM " + TABLE_NAME;
     }
 
+    public static String createSelectBySurveyStatement(int surveyId) {
+        return "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_SURVEY_ID + "=" + surveyId;
+    }
+
     static ContentValues createContentValues(Vote vote) {
         final ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_TIMESTAMP, vote.getTimestamp().getTime());
@@ -83,5 +87,4 @@ final class VotesTableHelper {
         contentValues.put(COLUMN_VOTED_POINTS, vote.getVotedPoints());
         return contentValues;
     }
-
 }
