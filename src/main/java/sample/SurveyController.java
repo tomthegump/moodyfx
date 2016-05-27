@@ -12,7 +12,7 @@ import sample.data.Survey;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class SurveyController implements Initializable {
 
     @FXML
     private Label moodQuestionLabel;
