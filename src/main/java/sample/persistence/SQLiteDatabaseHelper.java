@@ -1,6 +1,5 @@
 package sample.persistence;
 
-import javax.sql.rowset.CachedRowSet;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +22,7 @@ public abstract class SQLiteDatabaseHelper {
             onCreate(database);
         }
 
-        final ResultSet resultSet = database.executeQuery("PRAGMA user_version");
+        final ResultSet resultSet = database.select("PRAGMA user_version");
         final int currentDbVersion = resultSet.getInt("user_version");
         if (currentDbVersion < dbVersion) {
             upgradeDatabase(currentDbVersion, dbVersion);
@@ -37,14 +36,14 @@ public abstract class SQLiteDatabaseHelper {
     private void upgradeDatabase(int currentDbVersion, int goalDbVersion) throws SQLException {
         while (currentDbVersion < goalDbVersion) {
             onUpgrade(database, currentDbVersion, ++currentDbVersion);
-            database.executeInsert("PRAGMA user_version = " + currentDbVersion);
+            database.executeSqlStatement("PRAGMA user_version = " + currentDbVersion);
         }
     }
 
     private void downgradeDatabase(int currentDbVersion, int goalDbVersion) throws SQLException {
         while (currentDbVersion > goalDbVersion) {
             onDowngrade(database, currentDbVersion, --currentDbVersion);
-            database.executeInsert("PRAGMA user_version = " + currentDbVersion);
+            database.executeSqlStatement("PRAGMA user_version = " + currentDbVersion);
         }
     }
 

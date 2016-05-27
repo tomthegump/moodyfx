@@ -8,69 +8,72 @@ import java.util.List;
  */
 public class SQLStatement {
 
-    public static SelectStatementFromBuilder select(String whatToSelect) {
+    public static SelectStatementFromBuilder select(final String whatToSelect) {
         return new SelectStatementFromBuilder(whatToSelect);
     }
 
-    public static class SelectStatementFromBuilder {
+    public static void insertInto(final String whereToInsert) {
 
-        private String whatToSelect;
+    }
+
+    public static final class SelectStatementFromBuilder {
+
+        private final String whatToSelect;
 
         private SelectStatementFromBuilder(final String whatToSelect) {
             this.whatToSelect = whatToSelect;
         }
 
-        public SelectStatementWhereBuilder from(final String whereToSelect) {
+        public final SelectStatementWhereBuilder from(final String whereToSelect) {
             return new SelectStatementWhereBuilder(whatToSelect, whereToSelect);
         }
-
     }
 
-    public static class SelectStatementWhereBuilder {
+    public static final class SelectStatementWhereBuilder {
 
         private final String whatToSelect;
         private final String whereToSelect;
 
-        private SelectStatementWhereBuilder(String whatToSelect, String whereToSelect) {
+        private SelectStatementWhereBuilder(final String whatToSelect, final String whereToSelect) {
             this.whatToSelect = whatToSelect;
             this.whereToSelect = whereToSelect;
         }
 
-        public SelectStatementWhereConcatenationBuilder where(String query) {
+        public final SelectStatementWhereConcatenationBuilder where(final String query) {
             return new SelectStatementWhereConcatenationBuilder(whatToSelect, whereToSelect, query);
         }
 
         @Override
-        public String toString() {
+        public final String toString() {
             return "SELECT " + whatToSelect + " FROM " + whereToSelect;
         }
     }
 
-    public static class SelectStatementWhereConcatenationBuilder {
+    public static final class SelectStatementWhereConcatenationBuilder {
 
         private final List<String> queries = new ArrayList<>();
         private final String whatToSelect;
         private final String whereToSelect;
-        private String firstQuery;
+        private final String firstQuery;
 
-        private SelectStatementWhereConcatenationBuilder(String whatToSelect, String whereToSelect, String firstQuery) {
+        private SelectStatementWhereConcatenationBuilder(final String whatToSelect, final String whereToSelect, final String firstQuery) {
             this.whatToSelect = whatToSelect;
             this.whereToSelect = whereToSelect;
             this.firstQuery = firstQuery;
         }
 
-        public SelectStatementWhereConcatenationBuilder and(String query) {
+        public final SelectStatementWhereConcatenationBuilder and(final String query) {
             queries.add(" AND " + query);
             return this;
         }
 
-        public SelectStatementWhereConcatenationBuilder or(String query) {
+        public final SelectStatementWhereConcatenationBuilder or(final String query) {
             queries.add(" OR " + query);
             return this;
         }
 
         @Override
-        public String toString() {
+        public final String toString() {
             final StringBuilder selectStatement = new StringBuilder();
             selectStatement.append("SELECT ").append(whatToSelect);
             selectStatement.append(" FROM ").append(whereToSelect);
@@ -79,7 +82,6 @@ public class SQLStatement {
             selectStatement.append(";");
             return selectStatement.toString();
         }
-
     }
 
 }

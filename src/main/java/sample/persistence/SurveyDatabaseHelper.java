@@ -4,7 +4,6 @@ import rx.Observable;
 import sample.data.Survey;
 import sample.data.Vote;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -38,36 +37,36 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
         onCreate(database);
     }
 
-    public final Observable<Survey> queryAllSurveys() {
+    public final Observable<Survey> selectAllSurveys() {
         String queryStatement = SurveyTableHelper.createSelectAllStatement();
-        return getDatabaseAccess().executeQueryAsync(queryStatement, SurveyTableHelper::mapResultSetToSurvey);
+        return getDatabaseAccess().select(queryStatement, SurveyTableHelper::mapResultSetToSurvey);
     }
 
-    public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback) {
-        final String insertStatement = SurveyTableHelper.createInsertStatement(survey);
-        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback);
+    public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Integer> resultCallback) {
+        final ContentValues valuesToInsert = SurveyTableHelper.createContentValues(survey);
+        getDatabaseAccess().insert(SurveyTableHelper.TABLE_NAME, valuesToInsert, resultCallback);
     }
 
-    public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
+    public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Integer> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
-        final String insertStatement = SurveyTableHelper.createInsertStatement(survey);
-        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback, errorCallback);
+        final ContentValues valuesToInsert = SurveyTableHelper.createContentValues(survey);
+        getDatabaseAccess().insert(SurveyTableHelper.TABLE_NAME, valuesToInsert, resultCallback, errorCallback);
     }
 
-    public final Observable<Vote> queryAllVotes() {
+    public final Observable<Vote> selectAllVotes() {
         String queryStatement = VotesTableHelper.createSelectAllStatement();
-        return getDatabaseAccess().executeQueryAsync(queryStatement, VotesTableHelper::mapResultSetToVote);
+        return getDatabaseAccess().select(queryStatement, VotesTableHelper::mapResultSetToVote);
     }
 
-    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Boolean> resultCallback) {
-        final String insertStatement = VotesTableHelper.createInsertStatement(vote);
-        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback);
+    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Integer> resultCallback) {
+        final ContentValues valuesToInsert = VotesTableHelper.createContentValues(vote);
+        getDatabaseAccess().insert(VotesTableHelper.TABLE_NAME, valuesToInsert, resultCallback);
     }
 
-    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Boolean> resultCallback,
+    public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Integer> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
-        final String insertStatement = VotesTableHelper.createInsertStatement(vote);
-        getDatabaseAccess().executeInsertAsync(insertStatement, resultCallback, errorCallback);
+        final ContentValues valuesToInsert = VotesTableHelper.createContentValues(vote);
+        getDatabaseAccess().insert(VotesTableHelper.TABLE_NAME, valuesToInsert, resultCallback, errorCallback);
     }
 
 }

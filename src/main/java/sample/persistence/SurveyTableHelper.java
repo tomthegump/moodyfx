@@ -1,14 +1,21 @@
 package sample.persistence;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sample.data.Survey;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 /**
- * Created by Ingo on 20.05.2016.
+ * A helper to access the Survey Table.
+ *
+ * @author ISchwarz
  */
 final class SurveyTableHelper {
+
+    private static final Logger LOGGER = LogManager.getLogger(SurveyTableHelper.class);
 
     public static final String TABLE_NAME = "surveys";
 
@@ -25,32 +32,22 @@ final class SurveyTableHelper {
 
     static void createIn(SQLiteDatabase database) {
         try {
-            database.executeInsert(SQL_CREATE_SURVEYS_TABLE);
+            database.executeSqlStatement(SQL_CREATE_SURVEYS_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     static void dropFrom(SQLiteDatabase database) {
         try {
-            database.executeInsert(SQL_DROP_SURVEYS_TABLE);
+            database.executeSqlStatement(SQL_DROP_SURVEYS_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     static String createSelectAllStatement() {
         return "SELECT * FROM " + TABLE_NAME;
-    }
-
-    static String createInsertStatement(final Survey survey) {
-        return "INSERT INTO " + TABLE_NAME +
-                " (" + COLUMN_ID +
-                ", " + COLUMN_QUESTION +
-                ", " + COLUMN_ANSWER_TYPE + ") " +
-                "VALUES (" + survey.getId() +
-                ", '" + survey.getQuestion() +
-                "', '" + survey.getAnswerType() + "')";
     }
 
     static Survey mapResultSetToSurvey(final ResultSet resultSet) {
@@ -60,9 +57,17 @@ final class SurveyTableHelper {
             final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(COLUMN_ANSWER_TYPE));
             return new Survey(id, question, answerType);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    static ContentValues createContentValues(final Survey survey) {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_ID, survey.getId());
+        contentValues.put(COLUMN_QUESTION, survey.getQuestion());
+        contentValues.put(COLUMN_ANSWER_TYPE, survey.getAnswerType().toString());
+        return contentValues;
     }
 
 }

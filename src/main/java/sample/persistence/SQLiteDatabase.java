@@ -1,5 +1,7 @@
 package sample.persistence;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.sqlite.SQLiteConfig;
 import rx.Observable;
 import rx.functions.Func1;
@@ -7,6 +9,7 @@ import rx.subjects.ReplaySubject;
 
 import java.io.File;
 import java.sql.*;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -25,6 +28,7 @@ public class SQLiteDatabase {
         void onError(Throwable e);
     }
 
+    private static final Logger LOGGER = LogManager.getLogger(SQLiteDatabase.class);
     private static final String JDBC_SQLITE_PREFIX = "jdbc:sqlite:";
     private static final String DB_FILE_ENDING = ".db";
 
@@ -36,7 +40,7 @@ public class SQLiteDatabase {
         return connectTo(dbName, false);
     }
 
-    public static SQLiteDatabase connectTo(final String dbName, final File directory ) throws SQLException {
+    public static SQLiteDatabase connectTo(final String dbName, final File directory) throws SQLException {
         return connectTo(dbName, directory, false);
     }
 
@@ -48,12 +52,12 @@ public class SQLiteDatabase {
         final SQLiteConfig config = new SQLiteConfig();
         config.setReadOnly(readOnly);
 
-        if(!directory.exists()) {
+        if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        if(!directory.isDirectory()) {
-            throw new SQLException("The given file must be a directory! ["+ directory.getAbsolutePath() + "]" );
+        if (!directory.isDirectory()) {
+            throw new SQLException("The given file must be a directory! [" + directory.getAbsolutePath() + "]");
         }
 
         final File dbFile = new File(directory, dbName + DB_FILE_ENDING);
@@ -71,31 +75,56 @@ public class SQLiteDatabase {
         statementExecutor = newStatementExecutor;
     }
 
-    public boolean executeInsert(final String insertStatement) throws SQLException {
+    public boolean executeSqlStatement(final String insertStatement) throws SQLException {
         final Statement statement = dbConnection.createStatement();
         final boolean result = statement.execute(insertStatement);
         statement.close();
         return result;
     }
 
-    public void executeInsertAsync(final String insertStatement, final ResultCallback<Boolean> resultCallback) {
-        executeInsertAsync(insertStatement, resultCallback, new DefaultErrorCallback());
-    }
-
-    public void executeInsertAsync(final String insertStatement, final ResultCallback<Boolean> resultCallback,
-                                   final ErrorCallback errorCallback) {
-        statementExecutor.execute(new InsertRunnable(insertStatement, resultCallback, errorCallback));
-    }
-
-    public ResultSet executeQuery(final String queryStatement) throws SQLException {
+    public ResultSet select(final String selectStatement) throws SQLException {
         final Statement statement = dbConnection.createStatement();
-        return statement.executeQuery(queryStatement);
+        return statement.executeQuery(selectStatement);
     }
 
-    public <T> Observable<T> executeQueryAsync(final String queryStatement, Func1<ResultSet, T> mapper) {
+    public <T> Observable<T> select(final String queryStatement, final Func1<ResultSet, T> mapper) {
         final ReplaySubject<T> resultObservable = ReplaySubject.create();
         statementExecutor.execute(new QueryRunnable<>(queryStatement, resultObservable, mapper));
         return resultObservable;
+    }
+
+    public int insert(final String tableName, final ContentValues values) throws SQLException {
+        final Set<String> keySet = values.keySet();
+
+        String insertStatement = "INSERT INTO " + tableName + " (";
+        for (final String key : keySet) {
+            insertStatement += key + ",";
+        }
+        insertStatement = insertStatement.substring(0, insertStatement.length() - 1);
+        insertStatement += ") VALUES (";
+        for (final String key : keySet) {
+            if (values.get(key) instanceof String) {
+                insertStatement += "'"+ values.getAsString(key) + "',";
+            } else {
+                insertStatement += values.getAsString(key) + ",";
+            }
+        }
+        insertStatement = insertStatement.substring(0, insertStatement.length() - 1);
+        insertStatement += ");";
+
+        final Statement statement = dbConnection.createStatement();
+        int updatedRow = statement.executeUpdate(insertStatement);
+        statement.close();
+        return updatedRow;
+    }
+
+    public void insert(final String tableName, final ContentValues values, final ResultCallback<Integer> resultCallback) {
+        insert(tableName, values, resultCallback, new DefaultErrorCallback());
+    }
+
+    public void insert(final String tableName, final ContentValues values, final ResultCallback<Integer> resultCallback,
+                       final ErrorCallback errorCallback) {
+        statementExecutor.execute(new InsertRunnable(tableName, values, resultCallback, errorCallback));
     }
 
     public void close() throws SQLException {
@@ -116,20 +145,22 @@ public class SQLiteDatabase {
 
     private final class InsertRunnable implements Runnable {
 
-        private final String insertStatement;
-        private final ResultCallback<Boolean> resultCallback;
+        private final ResultCallback<Integer> resultCallback;
         private final ErrorCallback errorCallback;
+        private final ContentValues values;
+        private final String tableName;
 
-        InsertRunnable(final String insertStatement, final ResultCallback<Boolean> resultCallback, final ErrorCallback errorCallback) {
-            this.insertStatement = insertStatement;
+        InsertRunnable(final String tableName, final ContentValues values, final ResultCallback<Integer> resultCallback, final ErrorCallback errorCallback) {
             this.resultCallback = resultCallback;
             this.errorCallback = errorCallback;
+            this.tableName = tableName;
+            this.values = values;
         }
 
         @Override
         public void run() {
             try {
-                boolean result = executeInsert(insertStatement);
+                int result = insert(tableName, values);
                 resultCallback.onResult(result);
             } catch (Throwable e) {
                 errorCallback.onError(e);
@@ -152,7 +183,7 @@ public class SQLiteDatabase {
         @Override
         public void run() {
             try {
-                final ResultSet resultSet = executeQuery(queryStatement);
+                final ResultSet resultSet = select(queryStatement);
                 while (resultSet.next()) {
                     T mappedData = mapper.call(resultSet);
                     resultObservable.onNext(mappedData);
@@ -169,7 +200,7 @@ public class SQLiteDatabase {
 
         @Override
         public void onError(Throwable e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

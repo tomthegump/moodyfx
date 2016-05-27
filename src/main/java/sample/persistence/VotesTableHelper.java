@@ -1,15 +1,22 @@
 package sample.persistence;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sample.data.Vote;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+
 /**
- * Created by Ingo on 20.05.2016.
+ * A helper to acces the Votes table.
+ *
+ * @author ISchwarz
  */
 final class VotesTableHelper {
+
+    private static final Logger LOGGER = LogManager.getLogger(VotesTableHelper.class);
 
     public static final String TABLE_NAME = "votes";
 
@@ -36,31 +43,20 @@ final class VotesTableHelper {
 
     static void createIn(SQLiteDatabase database) {
         try {
-            database.executeInsert(SQL_CREATE_VOTES_TABLE);
+            database.executeSqlStatement(SQL_CREATE_VOTES_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     static void dropFrom(SQLiteDatabase database) {
         try {
-            database.executeInsert(SQL_DROP_VOTES_TABLE);
+            database.executeSqlStatement(SQL_DROP_VOTES_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
-    static String createInsertStatement(final Vote vote) {
-        return "INSERT INTO " + TABLE_NAME +
-                " (" + COLUMN_TIMESTAMP +
-                ", " + COLUMN_SURVEY_ID +
-                ", " + COLUMN_SITE +
-                ", " + COLUMN_VOTED_POINTS + ") " +
-                "VALUES (" + vote.getTimestamp().getTime() +
-                ", " + vote.getSurveyId() +
-                ", '" + vote.getSite() + "'" +
-                ", " + vote.getVotedPoints() + ")";
-    }
 
     public static Vote mapResultSetToVote(ResultSet resultSet) {
         try {
@@ -70,12 +66,22 @@ final class VotesTableHelper {
             final Date timestamp = new Date(resultSet.getLong(COLUMN_TIMESTAMP));
             return new Vote(surveyId, votedPoints, site, timestamp);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         return null;
     }
 
-    public static String createSelectAllStatement() {
+    static String createSelectAllStatement() {
         return "SELECT * FROM " + TABLE_NAME;
     }
+
+    static ContentValues createContentValues(Vote vote) {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_TIMESTAMP, vote.getTimestamp().getTime());
+        contentValues.put(COLUMN_SURVEY_ID, vote.getSurveyId());
+        contentValues.put(COLUMN_SITE, vote.getSite());
+        contentValues.put(COLUMN_VOTED_POINTS, vote.getVotedPoints());
+        return contentValues;
+    }
+
 }

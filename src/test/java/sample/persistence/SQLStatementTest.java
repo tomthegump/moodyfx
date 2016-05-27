@@ -11,8 +11,7 @@ public class SQLStatementTest {
 
     @Test
     public void select() throws Exception {
-        System.out.println(SQLStatement.select("*")
-                .from("votes")
+        System.out.println(SQLStatement.select("*").from("votes")
                 .where("surveyId = 1").or("surveyId = 2").and("question like '%How%'"));
     }
 

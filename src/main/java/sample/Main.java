@@ -18,11 +18,11 @@ public class Main extends Application {
 
         SurveyDatabaseHelper surveyDatabaseHelper = new SurveyDatabaseHelper();
 //        surveyDatabaseHelper.insert(survey, System.out::println, System.err::println);
-//        surveyDatabaseHelper.queryAllSurveys().subscribe(System.out::println);
+//        surveyDatabaseHelper.selectAllSurveys().subscribe(System.out::println);
 
 //        Vote vote = new Vote(survey.getId(), 4, "C2-Team");
 //        surveyDatabaseHelper.insert(vote, System.out::println, System.err::println);
-//        surveyDatabaseHelper.queryAllVotes().subscribe(System.out::println);
+//        surveyDatabaseHelper.selectAllVotes().subscribe(System.out::println);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = fxmlLoader.load();

@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.util.concurrent.Executor;
 
@@ -24,7 +23,7 @@ public class SQLiteDatabaseTest {
     public void setUp() throws Exception {
         cut = SQLiteDatabase.connectTo(DB_NAME);
         cut.setStatementExecutor(new MainThreadExecutor());
-        cut.executeInsert("CREATE TABLE testTable " +
+        cut.executeSqlStatement("CREATE TABLE testTable " +
                 "( " +
                 "ID    INT   PRIMARY KEY     NOT NULL, " +
                 "NAME  TEXT                  NOT NULL  " +
@@ -43,7 +42,7 @@ public class SQLiteDatabaseTest {
         final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
 
         // when
-        final boolean result = cut.executeInsert(insertStatement);
+        final boolean result = cut.executeSqlStatement(insertStatement);
 
         // then
         assertFalse(result);
@@ -55,20 +54,20 @@ public class SQLiteDatabaseTest {
         final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
 
         // when
-        cut.executeInsertAsync(insertStatement, Assert::assertFalse, SQLiteDatabaseTest::printErrorAndFail);
+        cut.insert(insertStatement, Assert::assertFalse, SQLiteDatabaseTest::printErrorAndFail);
     }
 
     @Test
     public void shouldGiveQueryResults() throws Exception {
         // given
         final String insertStatement1 = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
-        cut.executeInsert(insertStatement1);
+        cut.executeSqlStatement(insertStatement1);
         final String insertStatement2 = "INSERT INTO testTable (ID, NAME) VALUES (2, 'Saul')";
-        cut.executeInsert(insertStatement2);
+        cut.executeSqlStatement(insertStatement2);
         final String queryStatement = "SELECT * FROM testTable";
 
         // when
-        final ResultSet resultSet = cut.executeQuery(queryStatement);
+        final ResultSet resultSet = cut.select(queryStatement);
 
         Counter resultCount = new Counter();
         while (resultSet.next()) {
@@ -84,14 +83,14 @@ public class SQLiteDatabaseTest {
     public void shouldGiveQueryResultsAsync() throws Exception {
         // given
         final String insertStatement1 = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg');";
-        cut.executeInsert(insertStatement1);
+        cut.executeSqlStatement(insertStatement1);
         final String insertStatement2 = "INSERT INTO testTable (ID, NAME) VALUES (2, 'Saul');";
-        cut.executeInsert(insertStatement2);
+        cut.executeSqlStatement(insertStatement2);
         final String queryStatement = "SELECT * FROM testTable;";
 
         // when
         final Counter resultCount = new Counter();
-        cut.executeQueryAsync(queryStatement, r -> "")
+        cut.select(queryStatement, r -> "")
                 .subscribe(r -> resultCount.increment(), SQLiteDatabaseTest::printErrorAndFail);
 
         // then
