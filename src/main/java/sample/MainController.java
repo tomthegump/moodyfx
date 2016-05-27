@@ -2,12 +2,15 @@ package sample;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
 import sample.data.Survey;
 import sample.data.Vote;
 import sample.export.JsonExportFile;
@@ -22,7 +25,8 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
-    private static final int THANKS_VIEW_DISPLAY_DURATION_IN_SECONDS = 5;
+    private static final int THANKS_VIEW_DISPLAY_DURATION_IN_SECONDS = 15;
+    private static final int VIEW_TRANSITION_DURATION_IN_SECONDS = 3;
     private static final int MILLIS_PER_SECOND = 1000;
 
     @FXML
@@ -61,11 +65,35 @@ public class MainController implements Initializable {
     }
 
     private void setView(Parent view) {
+        Node node = null;
+        int viewTransitionDuration = VIEW_TRANSITION_DURATION_IN_SECONDS * MILLIS_PER_SECOND;
+        try {
+            node = contentPane.getChildren().get(0);
+            viewTransitionDuration /= 2;
+        } catch (IndexOutOfBoundsException ignored) {}
+
+        // fade out
+        if(node != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(viewTransitionDuration), node);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.play();
+        }
+
+        // switch
         AnchorPane.setTopAnchor(view, 0.0);
         AnchorPane.setRightAnchor(view, 0.0);
         AnchorPane.setLeftAnchor(view, 0.0);
         AnchorPane.setBottomAnchor(view, 0.0);
+        view.setVisible(false);
+
+        // fade in
         contentPane.getChildren().setAll(view);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(viewTransitionDuration), view);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        view.setVisible(true);
+        fadeIn.play();
     }
 
     public void showSurvey(Survey survey) {
