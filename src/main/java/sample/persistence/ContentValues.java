@@ -37,19 +37,11 @@ public class ContentValues {
         putObject(key, value);
     }
 
-    public void put(final String key, final Byte value) {
-        putObject(key, value);
-    }
-
     public void put(final String key, final Float value) {
         putObject(key, value);
     }
 
     public void put(final String key, final Short value) {
-        putObject(key, value);
-    }
-
-    public void put(final String key, final byte[] value) {
         putObject(key, value);
     }
 
@@ -146,31 +138,6 @@ public class ContentValues {
     }
 
     /**
-     * Gets a value and converts it to a Byte.
-     *
-     * @param key the value to get
-     * @return the Byte value, or null if the value is missing or cannot be converted
-     */
-    public Byte getAsByte(String key) {
-        Object value = keyValueMap.get(key);
-        try {
-            return value != null ? ((Number) value).byteValue() : null;
-        } catch (ClassCastException e) {
-            if (value instanceof CharSequence) {
-                try {
-                    return Byte.valueOf(value.toString());
-                } catch (NumberFormatException e2) {
-                    LOGGER.error("Cannot parse Byte value for " + value + " at key " + key, e2);
-                    return null;
-                }
-            } else {
-                LOGGER.error("Cannot cast value for " + key + " to a Byte: " + value, e);
-                return null;
-            }
-        }
-    }
-
-    /**
      * Gets a value and converts it to a Double.
      *
      * @param key the value to get
@@ -241,23 +208,6 @@ public class ContentValues {
             }
         }
     }
-
-    /**
-     * Gets a value that is a byte array. Note that this method will not convert
-     * any other types to byte arrays.
-     *
-     * @param key the value to get
-     * @return the byte[] value, or null is the value is missing or not a byte[]
-     */
-    public byte[] getAsByteArray(String key) {
-        Object value = keyValueMap.get(key);
-        if (value instanceof byte[]) {
-            return (byte[]) value;
-        } else {
-            return null;
-        }
-    }
-
 
     public boolean containsKey(final String key) {
         return keyValueMap.containsKey(key);
