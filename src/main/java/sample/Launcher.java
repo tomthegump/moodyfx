@@ -23,7 +23,7 @@ public class Launcher extends Application {
         Scene scene = new Scene(root, 1000, 600);
         scene.setOnKeyPressed(event -> {
             if (KeyCodeCombination.keyCombination("Ctrl+E").match(event)) {
-                mainController.exportVotes();
+                mainController.exportSurveyWithVotes();
             }
         });
 

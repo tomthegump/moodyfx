@@ -127,11 +127,19 @@ public class MainController implements Initializable {
                 result -> System.out.println("Voted Successfully"), System.err::println);
     }
 
-    public void exportVotes() {
+    public void exportSurveyWithVotes() {
         try {
-            JsonExportFile exportFile = JsonExportFile.createExportFile("votes", new File("export.json"));
-            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId()).map(MainController::mapToJson).subscribe(exportFile::append);
-            exportFile.close();
+            StringBuilder votesBuilder = new StringBuilder("[");
+            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId())
+                    .map(MainController::mapToJson)
+                    .subscribe(jsonVote -> votesBuilder.append(jsonVote).append(", "));
+            votesBuilder.setLength(votesBuilder.length()-2);
+            votesBuilder.append("]");
+
+            JsonExportFile.createExportFile(new File("export.json"))
+                    .append("survey", mapToJson(survey))
+                    .append("votes", votesBuilder.toString())
+                    .close();
         } catch (IOException e) {
             e.printStackTrace();
         }
