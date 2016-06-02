@@ -21,6 +21,7 @@ final class SurveyTableHelper {
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_QUESTION = "question";
+    public static final String COLUMN_ICON_TYPE = "answerType";
     public static final String COLUMN_ANSWER_TYPE = "answerType";
 
     private static final String SQL_CREATE_SURVEYS_TABLE = "CREATE TABLE " + TABLE_NAME + " " +
@@ -55,7 +56,8 @@ final class SurveyTableHelper {
             final int id = resultSet.getInt(COLUMN_ID);
             final String question = resultSet.getString(COLUMN_QUESTION);
             final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(COLUMN_ANSWER_TYPE));
-            return new Survey(id, question, answerType);
+            final Survey.IconType iconType = Survey.IconType.valueOf(resultSet.getString(COLUMN_ICON_TYPE));
+            return new Survey(id, question, answerType, iconType);
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -66,7 +68,7 @@ final class SurveyTableHelper {
         final ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ID, survey.getId());
         contentValues.put(COLUMN_QUESTION, survey.getQuestion());
-        contentValues.put(COLUMN_ANSWER_TYPE, survey.getAnswerType().toString());
+        contentValues.put(COLUMN_ANSWER_TYPE, survey.getIconType().toString());
         return contentValues;
     }
 

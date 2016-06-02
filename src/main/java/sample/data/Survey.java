@@ -5,13 +5,13 @@ package sample.data;
  */
 public class Survey {
 
-    public enum AnswerType {
+    public enum IconType {
         HAND("hand"),
         FACE("face");
 
         private String resourceName;
 
-        AnswerType(String resourceName) {
+        IconType(String resourceName) {
             this.resourceName = resourceName;
         }
 
@@ -20,18 +20,28 @@ public class Survey {
         }
     }
 
+    public enum AnswerType {
+        YES_NO, YES_NO_MEEH, RATING
+    }
+
     private int id;
     private String question;
     private AnswerType answerType;
+    private IconType iconType;
 
     public Survey(int id, String question) {
-        this(id, question, AnswerType.FACE);
+        this(id, question, AnswerType.RATING);
     }
 
     public Survey(int id, String question, AnswerType answerType) {
+        this(id, question, answerType, IconType.FACE);
+    }
+
+    public Survey(int id, String question, AnswerType answerType, IconType iconType) {
         this.id = id;
         this.question = question;
         this.answerType = answerType;
+        this.iconType = iconType;
     }
 
     public int getId() {
@@ -44,6 +54,10 @@ public class Survey {
 
     public AnswerType getAnswerType() {
         return answerType;
+    }
+
+    public IconType getIconType() {
+        return iconType;
     }
 
     @Override

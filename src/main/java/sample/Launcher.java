@@ -13,7 +13,7 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.HAND);
+        Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.YES_NO, Survey.IconType.FACE);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
         Parent root = fxmlLoader.load();
