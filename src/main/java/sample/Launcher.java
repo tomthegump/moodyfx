@@ -8,12 +8,15 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
 import sample.data.Survey;
+import sample.load.SurveyLoader;
+
+import java.io.File;
 
 public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Survey survey = new Survey(1, "How are you today?", Survey.AnswerType.YES_NO, Survey.IconType.FACE);
+        Survey survey = SurveyLoader.loadSurveyFromJson(new File("survey.json"));
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
         Parent root = fxmlLoader.load();
@@ -38,7 +41,6 @@ public class Launcher extends Application {
         });
         primaryStage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

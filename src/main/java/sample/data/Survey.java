@@ -24,10 +24,15 @@ public class Survey {
         YES_NO, YES_NO_MEEH, RATING
     }
 
-    private int id;
-    private String question;
-    private AnswerType answerType;
-    private IconType iconType;
+    private final int id;
+    private final String question;
+    private final AnswerType answerType;
+    private final IconType iconType;
+
+    private Survey() {
+        // used by json
+        this(0, null, null, null);
+    }
 
     public Survey(int id, String question) {
         this(id, question, AnswerType.RATING);
