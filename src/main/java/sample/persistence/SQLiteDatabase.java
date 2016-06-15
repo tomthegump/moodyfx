@@ -2,6 +2,8 @@ package sample.persistence;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jooq.Field;
+import org.jooq.conf.ParamType;
 import org.sqlite.SQLiteConfig;
 import rx.Observable;
 import rx.functions.Func1;
@@ -9,9 +11,12 @@ import rx.subjects.ReplaySubject;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import static org.jooq.impl.DSL.*;
 
 /**
  * Access to a SQLite database. Provides sync and async methods for reading and manipulating the data in the db.
@@ -20,21 +25,17 @@ import java.util.concurrent.Executors;
  */
 public class SQLiteDatabase {
 
-    public interface ResultCallback<T> {
-        void onResult(T result);
-    }
-
-    public interface ErrorCallback {
-        void onError(Throwable e);
-    }
-
     private static final Logger LOGGER = LogManager.getLogger(SQLiteDatabase.class);
     private static final String JDBC_SQLITE_PREFIX = "jdbc:sqlite:";
     private static final String DB_FILE_ENDING = ".db";
-
     private final Connection dbConnection;
     private final File dbFile;
     private Executor statementExecutor = Executors.newFixedThreadPool(10);
+
+    private SQLiteDatabase(final Connection dbConnection, final File dbFile) {
+        this.dbConnection = dbConnection;
+        this.dbFile = dbFile;
+    }
 
     public static SQLiteDatabase connectTo(final String dbName) throws SQLException {
         return connectTo(dbName, false);
@@ -66,11 +67,6 @@ public class SQLiteDatabase {
         return new SQLiteDatabase(dbConnection, dbFile);
     }
 
-    private SQLiteDatabase(final Connection dbConnection, final File dbFile) {
-        this.dbConnection = dbConnection;
-        this.dbFile = dbFile;
-    }
-
     public void setStatementExecutor(final Executor newStatementExecutor) {
         statementExecutor = newStatementExecutor;
     }
@@ -94,28 +90,19 @@ public class SQLiteDatabase {
     }
 
     public int insert(final String tableName, final ContentValues values) throws SQLException {
-        final Set<String> keySet = values.keySet();
-
-        String insertStatement = "INSERT INTO " + tableName + " (";
-        for (final String key : keySet) {
-            insertStatement += key + ",";
-        }
-        insertStatement = insertStatement.substring(0, insertStatement.length() - 1);
-        insertStatement += ") VALUES (";
-        for (final String key : keySet) {
-            if (values.get(key) instanceof String) {
-                insertStatement += "'"+ values.getAsString(key) + "',";
-            } else {
-                insertStatement += values.getAsString(key) + ",";
-            }
-        }
-        insertStatement = insertStatement.substring(0, insertStatement.length() - 1);
-        insertStatement += ");";
-
         final Statement statement = dbConnection.createStatement();
-        int updatedRow = statement.executeUpdate(insertStatement);
+        int updatedRow = statement.executeUpdate(insertInto(table(tableName)).set(toFieldMap(values))
+                .getSQL(ParamType.INLINED));
         statement.close();
         return updatedRow;
+    }
+
+    private Map<? extends Field<?>, ?> toFieldMap(ContentValues values) {
+        Map<Field<Object>, Object> map = new HashMap<>();
+        for (String key : values.keySet()) {
+            map.put(field(key), values.get(key));
+        }
+        return map;
     }
 
     public void insert(final String tableName, final ContentValues values, final ResultCallback<Integer> resultCallback) {
@@ -141,6 +128,14 @@ public class SQLiteDatabase {
 
     public boolean delete() {
         return dbFile.delete();
+    }
+
+    public interface ResultCallback<T> {
+        void onResult(T result);
+    }
+
+    public interface ErrorCallback {
+        void onError(Throwable e);
     }
 
     private final class InsertRunnable implements Runnable {
