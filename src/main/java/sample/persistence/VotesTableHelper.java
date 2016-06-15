@@ -2,6 +2,8 @@ package sample.persistence;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jooq.conf.ParamType;
+import org.jooq.util.sqlite.SQLiteDataType;
 import sample.data.Vote;
 
 import java.sql.ResultSet;
@@ -74,8 +76,8 @@ final class VotesTableHelper {
 
     public static String createSelectBySurveyStatement(int surveyId) {
         return select().from(table(VOTES))
-                .where(field(SURVEY_ID).eq(surveyId))
-                .getSQL();
+                .where(field(SURVEY_ID).equal(surveyId))
+                .getSQL(ParamType.INLINED);
     }
 
     static ContentValues createContentValues(Vote vote) {
