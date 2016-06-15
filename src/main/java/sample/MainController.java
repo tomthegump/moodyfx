@@ -2,6 +2,7 @@ package sample;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+import rx.Observable;
 import sample.data.Survey;
 import sample.data.Vote;
 import sample.export.JsonExportFile;
@@ -68,12 +70,14 @@ public class MainController implements Initializable {
         Node node = null;
         int viewTransitionDuration = VIEW_TRANSITION_DURATION_IN_SECONDS * MILLIS_PER_SECOND;
         try {
-            node = contentPane.getChildren().get(0);
+            node = contentPane.getChildren()
+                    .get(0);
             viewTransitionDuration /= 2;
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+        }
 
         // fade out
-        if(node != null) {
+        if (node != null) {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(viewTransitionDuration), node);
             fadeOut.setFromValue(1);
             fadeOut.setToValue(0);
@@ -88,7 +92,8 @@ public class MainController implements Initializable {
         view.setVisible(false);
 
         // fade in
-        contentPane.getChildren().setAll(view);
+        contentPane.getChildren()
+                .setAll(view);
         FadeTransition fadeIn = new FadeTransition(Duration.millis(viewTransitionDuration), view);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
@@ -128,24 +133,28 @@ public class MainController implements Initializable {
     }
 
     public void exportSurveyWithVotes() {
-        try {
-            StringBuilder votesBuilder = new StringBuilder("[");
-            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId())
-                    .map(MainController::mapToJson)
-                    .subscribe(jsonVote -> votesBuilder.append(jsonVote).append(", "));
-            votesBuilder.setLength(votesBuilder.length()-2);
-            votesBuilder.append("]");
-
-            JsonExportFile.createExportFile(new File("export.json"))
-                    .append("survey", mapToJson(survey))
-                    .append("votes", votesBuilder.toString())
-                    .close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        surveyToJson().concatWith(votesToJsonArray())
+                .reduce((survey, votes) -> survey + ", " + votes)
+                .map(json -> "{" + json + "}")
+                .subscribe(this::exportToFile);
     }
 
-    private static String mapToJson(Object object) {
+    private Observable<String> surveyToJson() {
+        return Observable.just(survey)
+                .map(MainController::toJson)
+                .map(survey -> "\"survey\":" + survey);
+    }
+
+    private Observable<String> votesToJsonArray() {
+        return surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId())
+                .map(MainController::toJson)
+                .toList()
+                .map(votes -> "[" + Joiner.on(", ")
+                        .join(votes) + "]")
+                .map(votesArray -> "\"votes\":" + votesArray);
+    }
+
+    private static String toJson(Object object) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(object);
@@ -153,5 +162,15 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void exportToFile(String json) {
+        try {
+            JsonExportFile.createExportFile(new File("export.json"))
+                    .append(json)
+                    .close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

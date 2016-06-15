@@ -8,12 +8,10 @@ import java.io.*;
 public class JsonExportFile {
 
     private final BufferedWriter fileWriter;
-    private boolean firstEntry = true;
 
     public static JsonExportFile createExportFile(File exportFile) throws IOException {
         exportFile.getAbsoluteFile().getParentFile().mkdirs();
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile)));
-        bufferedWriter.append("{");
         return new JsonExportFile(bufferedWriter);
     }
 
@@ -21,13 +19,9 @@ public class JsonExportFile {
         this.fileWriter = fileWriter;
     }
 
-    public JsonExportFile append(String key, String value) {
+    public JsonExportFile append(String value) {
         try {
-            if(!firstEntry) {
-                fileWriter.append(", ");
-            }
-            fileWriter.append("\"").append(key).append("\"").append(":").append(value);
-            firstEntry = false;
+            fileWriter.append(value);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,7 +29,6 @@ public class JsonExportFile {
     }
 
     public void close() throws IOException {
-        fileWriter.append("}");
         fileWriter.flush();
         fileWriter.close();
     }
