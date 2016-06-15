@@ -44,13 +44,13 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
 
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Integer> resultCallback) {
         final ContentValues valuesToInsert = SurveyTableHelper.createContentValues(survey);
-        getDatabaseAccess().insert(SurveyTableHelper.TABLE_NAME, valuesToInsert, resultCallback);
+        getDatabaseAccess().insert(SurveyTableHelper.SURVEYS, valuesToInsert, resultCallback);
     }
 
     public final void insert(final Survey survey, final SQLiteDatabase.ResultCallback<Integer> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
         final ContentValues valuesToInsert = SurveyTableHelper.createContentValues(survey);
-        getDatabaseAccess().insert(SurveyTableHelper.TABLE_NAME, valuesToInsert, resultCallback, errorCallback);
+        getDatabaseAccess().insert(SurveyTableHelper.SURVEYS, valuesToInsert, resultCallback, errorCallback);
     }
 
     public final Observable<Vote> selectAllVotes() {
@@ -65,12 +65,12 @@ public class SurveyDatabaseHelper extends SQLiteDatabaseHelper {
 
     public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Integer> resultCallback) {
         final ContentValues valuesToInsert = VotesTableHelper.createContentValues(vote);
-        getDatabaseAccess().insert(VotesTableHelper.TABLE_NAME, valuesToInsert, resultCallback);
+        getDatabaseAccess().insert(VotesTableHelper.VOTES, valuesToInsert, resultCallback);
     }
 
     public final void insert(final Vote vote, final SQLiteDatabase.ResultCallback<Integer> resultCallback,
                              final SQLiteDatabase.ErrorCallback errorCallback) {
         final ContentValues valuesToInsert = VotesTableHelper.createContentValues(vote);
-        getDatabaseAccess().insert(VotesTableHelper.TABLE_NAME, valuesToInsert, resultCallback, errorCallback);
+        getDatabaseAccess().insert(VotesTableHelper.VOTES, valuesToInsert, resultCallback, errorCallback);
     }
 }

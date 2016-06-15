@@ -7,6 +7,9 @@ import sample.data.Survey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.jooq.impl.DSL.*;
+import static org.jooq.util.sqlite.SQLiteDataType.*;
+
 
 /**
  * A helper to access the Survey Table.
@@ -17,47 +20,47 @@ final class SurveyTableHelper {
 
     private static final Logger LOGGER = LogManager.getLogger(SurveyTableHelper.class);
 
-    public static final String TABLE_NAME = "surveys";
-
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_QUESTION = "question";
-    public static final String COLUMN_ICON_TYPE = "answerType";
-    public static final String COLUMN_ANSWER_TYPE = "answerType";
-
-    private static final String SQL_CREATE_SURVEYS_TABLE = "CREATE TABLE " + TABLE_NAME + " " +
-            "(" + COLUMN_ID + "            INT         PRIMARY KEY     NOT NULL," +
-            " " + COLUMN_QUESTION + "      TEXT                        NOT NULL," +
-            " " + COLUMN_ANSWER_TYPE + "   VARCHAR(10)                 NOT NULL )";
-
-    private static final String SQL_DROP_SURVEYS_TABLE = "DROP TABLE " + TABLE_NAME;
+    public static final String SURVEYS = "surveys";
+    public static final String ID = "id";
+    public static final String QUESTION = "question";
+    public static final String ANSWER_TYPE = "answerType";
 
     static void createIn(SQLiteDatabase database) {
+        String sql = createTableIfNotExists(table(SURVEYS))
+                .column(field(ID, INT))
+                .column(field(QUESTION, TEXT))
+                .column(field(ANSWER_TYPE, VARCHAR.length(10)))
+                .constraints(
+                        constraint("PK_SURVEYS").primaryKey(field(ID))
+                )
+                .getSQL();
         try {
-            database.executeSqlStatement(SQL_CREATE_SURVEYS_TABLE);
+            database.executeSqlStatement(sql);
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
 
     static void dropFrom(SQLiteDatabase database) {
+        String sql = dropTableIfExists(table(SURVEYS)).getSQL();
         try {
-            database.executeSqlStatement(SQL_DROP_SURVEYS_TABLE);
+            database.executeSqlStatement(sql);
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
 
     static String createSelectAllStatement() {
-        return "SELECT * FROM " + TABLE_NAME;
+        return select().from(table(SURVEYS))
+                .getSQL();
     }
 
     static Survey mapResultSetToSurvey(final ResultSet resultSet) {
         try {
-            final int id = resultSet.getInt(COLUMN_ID);
-            final String question = resultSet.getString(COLUMN_QUESTION);
-            final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(COLUMN_ANSWER_TYPE));
-            final Survey.IconType iconType = Survey.IconType.valueOf(resultSet.getString(COLUMN_ICON_TYPE));
-            return new Survey(id, question, answerType, iconType);
+            final int id = resultSet.getInt(ID);
+            final String question = resultSet.getString(QUESTION);
+            final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(ANSWER_TYPE));
+            return new Survey(id, question, answerType, null);
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -66,9 +69,10 @@ final class SurveyTableHelper {
 
     static ContentValues createContentValues(final Survey survey) {
         final ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_ID, survey.getId());
-        contentValues.put(COLUMN_QUESTION, survey.getQuestion());
-        contentValues.put(COLUMN_ANSWER_TYPE, survey.getIconType().toString());
+        contentValues.put(ID, survey.getId());
+        contentValues.put(QUESTION, survey.getQuestion());
+        contentValues.put(ANSWER_TYPE, survey.getIconType()
+                .toString());
         return contentValues;
     }
 
