@@ -149,8 +149,8 @@ public class MainController implements Initializable {
         return surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId())
                 .map(MainController::toJson)
                 .toList()
-                .map(votes -> "[" + Joiner.on(", ")
-                        .join(votes) + "]")
+                .map(Joiner.on(", ")::join)
+                .map(votes -> "[" + votes + "]")
                 .map(votesArray -> "\"votes\":" + votesArray);
     }
 
