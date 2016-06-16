@@ -24,12 +24,14 @@ final class SurveyTableHelper {
     public static final String ID = "id";
     public static final String QUESTION = "question";
     public static final String ANSWER_TYPE = "answerType";
+    public static final String ICON_TYPE = "iconType";
 
     static void createIn(SQLiteDatabase database) {
         String sql = createTableIfNotExists(table(SURVEYS))
                 .column(field(ID, INT))
                 .column(field(QUESTION, TEXT))
                 .column(field(ANSWER_TYPE, VARCHAR.length(10)))
+                .column(field(ICON_TYPE, VARCHAR.length(10)))
                 .constraints(
                         constraint("PK_SURVEYS").primaryKey(field(ID))
                 )
@@ -60,7 +62,8 @@ final class SurveyTableHelper {
             final int id = resultSet.getInt(ID);
             final String question = resultSet.getString(QUESTION);
             final Survey.AnswerType answerType = Survey.AnswerType.valueOf(resultSet.getString(ANSWER_TYPE));
-            return new Survey(id, question, answerType, null);
+            final Survey.IconType iconType = Survey.IconType.valueOf(resultSet.getString(ICON_TYPE));
+            return new Survey(id, question, answerType, iconType);
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -71,8 +74,8 @@ final class SurveyTableHelper {
         final ContentValues contentValues = new ContentValues();
         contentValues.put(ID, survey.getId());
         contentValues.put(QUESTION, survey.getQuestion());
-        contentValues.put(ANSWER_TYPE, survey.getIconType()
-                .toString());
+        contentValues.put(ANSWER_TYPE, survey.getAnswerType().toString());
+        contentValues.put(ICON_TYPE, survey.getIconType().toString());
         return contentValues;
     }
 
