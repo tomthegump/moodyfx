@@ -48,14 +48,14 @@ public class SQLiteDatabaseTest {
         assertFalse(result);
     }
 
-    @Test
-    public void shouldInsertGivenDataAsync() throws Exception {
-        // given
-        final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
-
-        // when
-        cut.insert(insertStatement, Assert::assertFalse, SQLiteDatabaseTest::printErrorAndFail);
-    }
+//    @Test
+//    public void shouldInsertGivenDataAsync() throws Exception {
+//        // given
+//        final String insertStatement = "INSERT INTO testTable (ID, NAME) VALUES (1, 'Heisenberg')";
+//
+//        // when
+//        cut.insert(insertStatement, Assert::assertFalse, SQLiteDatabaseTest::printErrorAndFail);
+//    }
 
     @Test
     public void shouldGiveQueryResults() throws Exception {

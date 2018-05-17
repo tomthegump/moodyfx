@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
+import sample.data.Config;
 import sample.data.Survey;
 import sample.load.SurveyLoader;
 
@@ -17,10 +18,12 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Survey survey = SurveyLoader.loadSurveyFromJson(new File("survey.json"));
+        Config config = SurveyLoader.loadConfigFromJson(new File("config.json"));
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
         Parent root = fxmlLoader.load();
         MainController mainController = fxmlLoader.getController();
+        mainController.setConfig(config);
         mainController.showSurvey(survey);
 
         Scene scene = new Scene(root, 1000, 600);

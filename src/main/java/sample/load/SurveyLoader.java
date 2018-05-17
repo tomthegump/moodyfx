@@ -1,6 +1,7 @@
 package sample.load;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import sample.data.Config;
 import sample.data.Survey;
 
 import java.io.File;
@@ -16,5 +17,12 @@ public class SurveyLoader {
         return mapper.readValue(jsonFile, Survey.class);
     }
 
-
+    public static Config loadConfigFromJson(File jsonFile) throws IOException {
+        if(jsonFile.exists()) {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(jsonFile, Config.class);
+        } else {
+            return new Config();
+        }
+    }
 }

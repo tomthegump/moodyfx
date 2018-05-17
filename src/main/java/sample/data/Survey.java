@@ -5,21 +5,6 @@ package sample.data;
  */
 public class Survey {
 
-    public enum IconType {
-        HAND("hand"),
-        FACE("face");
-
-        private String resourceName;
-
-        IconType(String resourceName) {
-            this.resourceName = resourceName;
-        }
-
-        public String getResourceName(int index) {
-            return index + "-" + resourceName + ".png";
-        }
-    }
-
     public enum AnswerType {
         YES_NO, YES_NO_MEEH, RATING
     }
@@ -27,11 +12,10 @@ public class Survey {
     private final int id;
     private final String question;
     private final AnswerType answerType;
-    private final IconType iconType;
 
     private Survey() {
         // used by json
-        this(0, null, null, null);
+        this(0, null, null);
     }
 
     public Survey(int id, String question) {
@@ -39,14 +23,9 @@ public class Survey {
     }
 
     public Survey(int id, String question, AnswerType answerType) {
-        this(id, question, answerType, IconType.FACE);
-    }
-
-    public Survey(int id, String question, AnswerType answerType, IconType iconType) {
         this.id = id;
         this.question = question;
         this.answerType = answerType;
-        this.iconType = iconType;
     }
 
     public int getId() {
@@ -59,10 +38,6 @@ public class Survey {
 
     public AnswerType getAnswerType() {
         return answerType;
-    }
-
-    public IconType getIconType() {
-        return iconType;
     }
 
     @Override

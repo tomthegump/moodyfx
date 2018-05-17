@@ -13,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import rx.Observable;
+import sample.data.Config;
 import sample.data.Survey;
 import sample.data.Vote;
 import sample.export.JsonExportFile;
@@ -20,6 +21,7 @@ import sample.persistence.SurveyDatabaseHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -27,7 +29,6 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
-    private static final int THANKS_VIEW_DISPLAY_DURATION_IN_SECONDS = 15;
     private static final int VIEW_TRANSITION_DURATION_IN_SECONDS = 3;
     private static final int MILLIS_PER_SECOND = 1000;
 
@@ -41,6 +42,7 @@ public class MainController implements Initializable {
     private Parent thanksView;
 
     private Survey survey;
+    private Config config;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -52,6 +54,10 @@ public class MainController implements Initializable {
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 
     private void initializeSurveyView() throws IOException {
@@ -101,13 +107,13 @@ public class MainController implements Initializable {
         fadeIn.play();
     }
 
-    public void showSurvey(Survey survey) {
+    public void showSurvey(Survey survey) throws MalformedURLException {
         this.survey = survey;
-        surveyController.showSurvey(survey);
+        surveyController.showSurvey(survey, config.getIconSet());
     }
 
     private void storeVotesAndShowThanksView(int surveyId, int votedPoints) {
-        showThanksView(THANKS_VIEW_DISPLAY_DURATION_IN_SECONDS);
+        showThanksView(config.getThanksDisplayDuration());
         storeVotes(surveyId, votedPoints);
     }
 
@@ -128,7 +134,7 @@ public class MainController implements Initializable {
     }
 
     private void storeVotes(int surveyId, int votedPoints) {
-        surveyDatabaseHelper.insert(new Vote(surveyId, votedPoints, "C2-Team"),
+        surveyDatabaseHelper.insert(new Vote(surveyId, votedPoints, config.getSite()),
                 result -> System.out.println("Voted Successfully"), System.err::println);
     }
 
