@@ -1,0 +1,12 @@
+package sample.export;
+
+import java.io.File;
+import java.io.IOException;
+
+public class VoteExporterFactory {
+
+    public static VoteExporter createExporterForJson(String fileName) throws IOException {
+        return JsonVoteExporter.create(new File(fileName + ".json"));
+    }
+
+}

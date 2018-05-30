@@ -1,8 +1,5 @@
 package sample;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -12,19 +9,19 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
-import rx.Observable;
 import sample.data.Config;
 import sample.data.Survey;
 import sample.data.Vote;
-import sample.export.JsonExportFile;
+import sample.export.VoteExporter;
+import sample.export.VoteExporterFactory;
 import sample.persistence.SurveyDatabaseHelper;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 
 public class MainController implements Initializable {
@@ -139,44 +136,26 @@ public class MainController implements Initializable {
     }
 
     public void exportSurveyWithVotes() {
-        surveyToJson().concatWith(votesToJsonArray())
-                .reduce((survey, votes) -> survey + ", " + votes)
-                .map(json -> "{" + json + "}")
-                .subscribe(this::exportToFile);
-    }
-
-    private Observable<String> surveyToJson() {
-        return Observable.just(survey)
-                .map(MainController::toJson)
-                .map(survey -> "\"survey\":" + survey);
-    }
-
-    private Observable<String> votesToJsonArray() {
-        return surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId())
-                .map(MainController::toJson)
-                .toList()
-                .map(Joiner.on(", ")::join)
-                .map(votes -> "[" + votes + "]")
-                .map(votesArray -> "\"votes\":" + votesArray);
-    }
-
-    private static String toJson(Object object) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void exportToFile(String json) {
-        try {
-            JsonExportFile.createExportFile(new File("export.json"))
-                    .append(json)
-                    .close();
-        } catch (IOException e) {
+        try (VoteExporter voteExporter = VoteExporterFactory.createExporterForJson("export")) {
+            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId()).subscribe(vote -> wrap(voteExporter::append).accept(vote));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public interface ThrowingConsumer<T, E extends Exception> {
+        void accept(T t) throws E;
+    }
+
+    static <T> Consumer<T> wrap(ThrowingConsumer<T, IOException> throwingConsumer) {
+
+        return i -> {
+            try {
+                throwingConsumer.accept(i);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        };
+    }
+
 }
