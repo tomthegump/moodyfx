@@ -9,3 +9,6 @@ classes
 *.iws
 *.db
 
+# files needed for local execution
+survey.json
+config.json
