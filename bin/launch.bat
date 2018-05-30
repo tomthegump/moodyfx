@@ -1,0 +1,1 @@
+start javaw -classpath ./lib/* sample.Launcher

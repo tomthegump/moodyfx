@@ -40,3 +40,21 @@ javafx {
     systemProperties = ['prism.disableRegionCaching':'true']
     arguments = ['-l', '--fast']
 }
+
+task packageDistribution(type: Zip) {
+    archiveName = "MoodyFx.zip"
+    destinationDir = file("${buildDir}/dist")
+
+    from("${buildDir}/libs") {
+        into "/lib"
+    }
+    from("${projectDir}/bin") {
+        into "/"
+    }
+    from("${projectDir}/icons") {
+        into "/icons"
+    }
+}
+
+packageDistribution.dependsOn jfxDeploy
+jfxDeploy.dependsOn clean
