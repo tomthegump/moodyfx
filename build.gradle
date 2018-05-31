@@ -37,12 +37,12 @@ javafx {
 
     // JVM arguments, system properties, application command line arguments
     jvmArgs = ['-XX:+AggressiveOpts', '-XX:CompileThreshold=1']
-    systemProperties = ['prism.disableRegionCaching':'true']
+    systemProperties = ['prism.disableRegionCaching': 'true']
     arguments = ['-l', '--fast']
 }
 
 task packageDistribution(type: Zip) {
-    archiveName = "MoodyFx.zip"
+    archiveName = "MoodyFX.zip"
     destinationDir = file("${buildDir}/dist")
 
     from("${buildDir}/libs") {
