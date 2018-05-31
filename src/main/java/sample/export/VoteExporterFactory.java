@@ -9,4 +9,8 @@ public class VoteExporterFactory {
         return JsonVoteExporter.create(new File(fileName + ".json"));
     }
 
+    public static VoteExporter createExporterForCsv(String fileName) throws IOException {
+        return CsvVoteExporter.create(new File(fileName + ".csv"));
+    }
+
 }

@@ -136,7 +136,7 @@ public class MainController implements Initializable {
     }
 
     public void exportSurveyWithVotes() {
-        try (VoteExporter voteExporter = VoteExporterFactory.createExporterForJson("export")) {
+        try (VoteExporter voteExporter = VoteExporterFactory.createExporterForCsv("export")) {
             surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId()).subscribe(vote -> wrap(voteExporter::append).accept(vote));
         } catch (Exception e) {
             e.printStackTrace();
