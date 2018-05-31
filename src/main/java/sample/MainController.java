@@ -12,6 +12,7 @@ import javafx.util.Duration;
 import sample.data.Config;
 import sample.data.Survey;
 import sample.data.Vote;
+import sample.export.VoteExportFormat;
 import sample.export.VoteExporter;
 import sample.export.VoteExporterFactory;
 import sample.persistence.SurveyDatabaseHelper;
@@ -135,23 +136,44 @@ public class MainController implements Initializable {
                 result -> System.out.println("Voted Successfully"), System.err::println);
     }
 
-    public void exportSurveyWithVotes() {
-        try (VoteExporter voteExporter = VoteExporterFactory.createExporterForCsv("export")) {
-            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId()).subscribe(vote -> wrap(voteExporter::append).accept(vote));
+    public void exportSurveyWithVotes(VoteExportFormat exportFormat) {
+        VoteExporter voteExporter;
+        try {
+            voteExporter = VoteExporterFactory.createExporterFor(exportFormat, "export");
+            surveyDatabaseHelper.selectAllVotesForSurvey(survey.getId()).subscribe(
+                    vote -> wrapConsumer(voteExporter::append).accept(vote),
+                    Throwable::printStackTrace,
+                    () -> wrapRunnable(voteExporter::close).run()
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public interface ThrowingConsumer<T, E extends Exception> {
-        void accept(T t) throws E;
+    public interface ThrowingConsumer<T> {
+        void accept(T t) throws Exception;
     }
 
-    static <T> Consumer<T> wrap(ThrowingConsumer<T, IOException> throwingConsumer) {
+    static <T> Consumer<T> wrapConsumer(ThrowingConsumer<T> throwingConsumer) {
 
         return i -> {
             try {
                 throwingConsumer.accept(i);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        };
+    }
+
+    public interface ThrowingRunnable {
+        void accept() throws Exception;
+    }
+
+    static Runnable wrapRunnable(ThrowingRunnable throwingConsumer) {
+
+        return () -> {
+            try {
+                throwingConsumer.accept();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

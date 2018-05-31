@@ -5,13 +5,18 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
 import sample.data.Config;
 import sample.data.Survey;
+import sample.export.VoteExportFormat;
 import sample.load.SurveyLoader;
 
 import java.io.File;
+import java.util.Optional;
 
 public class Launcher extends Application {
 
@@ -29,7 +34,27 @@ public class Launcher extends Application {
         Scene scene = new Scene(root, 1000, 600);
         scene.setOnKeyPressed(event -> {
             if (KeyCodeCombination.keyCombination("Ctrl+E").match(event)) {
-                mainController.exportSurveyWithVotes();
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Export Format Selection");
+                alert.setHeaderText("Export Votes");
+                alert.setContentText("Choose the export format. The export result will be located in the MoodyFX install directory.");
+
+                ButtonType buttonTypeJson = new ButtonType("JSON");
+                ButtonType buttonTypeCsv = new ButtonType("CSV");
+                ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeJson, buttonTypeCsv, buttonTypeCancel);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent()) {
+                    if (result.get() == buttonTypeJson) {
+                        mainController.exportSurveyWithVotes(VoteExportFormat.JSON);
+                    } else if (result.get() == buttonTypeCsv) {
+                        mainController.exportSurveyWithVotes(VoteExportFormat.CSV);
+                    } else {
+                        alert.close();
+                    }
+                }
             }
         });
 

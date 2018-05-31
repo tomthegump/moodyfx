@@ -13,4 +13,15 @@ public class VoteExporterFactory {
         return CsvVoteExporter.create(new File(fileName + ".csv"));
     }
 
+    public static VoteExporter createExporterFor(VoteExportFormat format, String fileName) throws IOException {
+        switch (format) {
+            case CSV:
+                return createExporterForCsv(fileName);
+            case JSON:
+                return createExporterForJson(fileName);
+            default:
+                return null;
+        }
+    }
+
 }
