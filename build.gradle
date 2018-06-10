@@ -41,7 +41,7 @@ javafx {
     arguments = ['-l', '--fast']
 }
 
-task packageDistribution(type: Zip) {
+task buildDistZip(type: Zip) {
     archiveName = "MoodyFX.zip"
     destinationDir = file("${buildDir}/dist")
 
@@ -53,5 +53,5 @@ task packageDistribution(type: Zip) {
     }
 }
 
-packageDistribution.dependsOn jfxDeploy
+buildDistZip.dependsOn jfxDeploy
 jfxDeploy.dependsOn clean
