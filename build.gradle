@@ -48,11 +48,8 @@ task packageDistribution(type: Zip) {
     from("${buildDir}/libs") {
         into "/lib"
     }
-    from("${projectDir}/bin") {
+    from("${projectDir}/src/dist") {
         into "/"
-    }
-    from("${projectDir}/icons") {
-        into "/icons"
     }
 }
 

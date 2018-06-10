@@ -10,7 +10,7 @@ classes
 *.db
 
 # files needed for local execution
-survey.json
-config.json
+/survey.json
+/config.json
 
 export.*
