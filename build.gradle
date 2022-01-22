@@ -1,57 +1,81 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.beryx.jlink' version '2.24.1'
+}
+
 repositories {
     mavenCentral()
 }
 
-apply plugin: 'idea'
-apply plugin: 'java'
-apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
+group 'com.codecrafters'
+version '1.0-SNAPSHOT'
 
-dependencies {
-    compile 'de.saxsys:mvvmfx:1.4.1'
-    compile 'org.xerial:sqlite-jdbc:3.8.11.2'
-    compile 'io.reactivex:rxjava:1.1.5'
+ext {
+    junitVersion = '4.12'
+}
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.4'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
-    compile 'org.apache.logging.log4j:log4j-api:2.5'
-    compile 'org.apache.logging.log4j:log4j-core:2.5'
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 
-    compile 'org.jooq:jooq:3.8.2'
-    compile 'com.google.guava:guava:19.0'
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+application {
+    mainModule = 'com.codecrafters'
+    mainClass = 'com.codecrafters.Launcher'
 }
 
 javafx {
-    // Points to JDK and its JavaFX libraries, also declares target runtime JDK
-    javaRuntime = System.getenv("JAVAHOME")
-
-    // Application name and ID presented by target OS
-    appID 'MoodyFx'
-    appName 'Moody FX'
-
-    // Main class of application
-    mainClass 'sample.Main'
-
-    // JVM arguments, system properties, application command line arguments
-    jvmArgs = ['-XX:+AggressiveOpts', '-XX:CompileThreshold=1']
-    systemProperties = ['prism.disableRegionCaching': 'true']
-    arguments = ['-l', '--fast']
+    version = '17.0.2'
+    modules = [
+        'javafx.base',
+        'javafx.controls',
+        'javafx.fxml',
+        'javafx.graphics'
+    ]
 }
 
-task buildDistZip(type: Zip) {
-    archiveName = "MoodyFX.zip"
-    destinationDir = file("${buildDir}/dist")
+dependencies {
+    implementation 'de.saxsys:mvvmfx:1.4.1'
+    implementation 'org.xerial:sqlite-jdbc:3.8.11.2'
+    implementation 'io.reactivex:rxjava:1.1.5'
 
-    from("${buildDir}/libs") {
-        into "/lib"
-    }
-    from("${projectDir}/src/dist") {
-        into "/"
-    }
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.7.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.7.4'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.5'
+    implementation 'org.apache.logging.log4j:log4j-core:2.5'
+
+    implementation 'org.jooq:jooq:3.8.2'
+    implementation 'com.google.guava:guava:19.0'
+
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation 'org.mockito:mockito-all:1.10.19'
 }
 
-buildDistZip.dependsOn jfxDeploy
-jfxDeploy.dependsOn clean
+tasks.run.jvmArgs += "-Dbase.dir=src/dist"
+
+jlink {
+    imageZip = project.file("${buildDir}/distributions/moodyfx-${javafx.platform.classifier}.zip")
+    options = ['--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'moodyfx'
+        noConsole = true
+        jvmArgs = ['-Dbase.dir=..']
+    }
+    addExtraDependencies("javafx")
+}
+
+jlinkZip {
+    group = 'distribution'
+}
+
+tasks.jlink.doLast {
+    copy {
+        from "src/dist"
+        into "$buildDir/image/"
+    }
+}
