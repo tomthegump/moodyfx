@@ -1,5 +1,9 @@
 package com.codecrafters;
 
+import com.codecrafters.data.Config;
+import com.codecrafters.data.Survey;
+import com.codecrafters.export.VoteExportFormat;
+import com.codecrafters.load.SurveyLoader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -10,12 +14,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
-import com.codecrafters.data.Config;
-import com.codecrafters.data.Survey;
-import com.codecrafters.export.VoteExportFormat;
-import com.codecrafters.load.SurveyLoader;
 
-import java.io.File;
 import java.util.Optional;
 
 public class Launcher extends Application {

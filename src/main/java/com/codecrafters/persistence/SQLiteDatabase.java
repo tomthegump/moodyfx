@@ -1,5 +1,6 @@
 package com.codecrafters.persistence;
 
+import com.codecrafters.Files;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.Field;
@@ -46,7 +47,7 @@ public class SQLiteDatabase {
     }
 
     public static SQLiteDatabase connectTo(final String dbName, boolean readOnly) throws SQLException {
-        return connectTo(dbName, new File("."), readOnly);
+        return connectTo(dbName, Files.PERSISTENCE_DIR, readOnly);
     }
 
     public static SQLiteDatabase connectTo(final String dbName, final File directory, final boolean readOnly) throws SQLException {

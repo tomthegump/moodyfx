@@ -60,6 +60,7 @@ tasks.run.jvmArgs += "-Dbase.dir=src/dist"
 
 jlink {
     imageZip = project.file("${buildDir}/distributions/moodyfx-${javafx.platform.classifier}.zip")
+    imageDir = file("$buildDir/moodyfx")
     options = ['--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'moodyfx'
@@ -67,6 +68,15 @@ jlink {
         jvmArgs = ['-Dbase.dir=..']
     }
     addExtraDependencies("javafx")
+
+/*
+    targetPlatform("linux-x64") {
+        jdkHome = jdkDownload("https://github.com/AdoptOpenJDK/openjdk17-binaries/releases/download/jdk-2021-03-31-09-47/OpenJDK-jdk_x64_linux_hotspot_2021-03-30-23-31.tar.gz")
+    }
+    targetPlatform("windows-x64") {
+        jdkHome = jdkDownload("https://github.com/AdoptOpenJDK/openjdk17-binaries/releases/download/jdk-2021-03-31-09-47/OpenJDK-jdk_x64_windows_hotspot_2021-03-30-23-30.zip")
+    }
+*/
 }
 
 jlinkZip {
@@ -76,6 +86,6 @@ jlinkZip {
 tasks.jlink.doLast {
     copy {
         from "src/dist"
-        into "$buildDir/image/"
+        into "$buildDir/moodyfx/"
     }
 }

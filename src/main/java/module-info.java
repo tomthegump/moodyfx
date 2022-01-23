@@ -9,6 +9,7 @@ open module com.codecrafters {
     requires jackson.databind;
     requires log4j.api;
     requires jooq;
+    requires sqlite.jdbc;
 
     exports com.codecrafters;
 }
